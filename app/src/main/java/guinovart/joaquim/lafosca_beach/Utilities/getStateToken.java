@@ -129,12 +129,13 @@ public class getStateToken extends AsyncTask<String, Void, String[]> {
             beach.happiness = json.getInt("happiness");
             beach.dirtiness = json.getInt("dirtiness");
             JSONArray kids = json.getJSONArray("kids");
+            beach.kids = new ArrayList<>();
             for(int i =0;i<kids.length();i++){
                 JSONObject kidObj = kids.getJSONObject(i);
                 Kid kid = new Kid();
                 kid.name = kidObj.getString("name");
                 kid.age = kidObj.getInt("age");
-                beach.kids = new ArrayList<>();
+
                 beach.kids.add(kid);
             }
             listener.onTaskCompleted(beach);

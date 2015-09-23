@@ -11,9 +11,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import guinovart.joaquim.lafosca_beach.Models.Beach;
+import guinovart.joaquim.lafosca_beach.Utilities.KidsAdapter;
 import guinovart.joaquim.lafosca_beach.Utilities.getStateToken;
 import guinovart.joaquim.lafosca_beach.Utilities.putPostToken;
 
@@ -27,6 +29,10 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
     TextView happinessTW;
     TextView dirtinessTW;
     TextView kidsTW;
+
+    ListView list;
+    KidsAdapter adapter;
+
 
     Button openBttn;
     Button cleanBttn;
@@ -43,6 +49,8 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
         happinessTW = (TextView) findViewById(R.id.happinessTV);
         dirtinessTW = (TextView) findViewById(R.id.dirtinessTV);
         kidsTW = (TextView) findViewById(R.id.kidsTV);
+
+        list = (ListView) findViewById(R.id.kid_list);
 
         openBttn = (Button) findViewById(R.id.close_button);
         cleanBttn = (Button) findViewById(R.id.clean_button);
@@ -132,6 +140,7 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
         flagTW.setVisibility(View.VISIBLE);
         kidsTW.setText("Kids");
         kidsTW.setVisibility(View.VISIBLE);
+        getKids(beach);
         happinessTW.setText("Happiness: " + Integer.toString(beach.happiness));
         happinessTW.setVisibility(View.VISIBLE);
         dirtinessTW.setText("Dirtiness: " + Integer.toString(beach.dirtiness));
@@ -149,6 +158,10 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
         openBttn.setText("OPEN");
         cleanBttn.setVisibility(View.VISIBLE);
         niveaBttn.setVisibility(View.GONE);
+    }
+    public void getKids(Beach beach){
+        adapter = new KidsAdapter(this,beach.kids);
+        list.setAdapter(adapter);
     }
     @Override
     public void onTaskCompleted(Beach beach) {

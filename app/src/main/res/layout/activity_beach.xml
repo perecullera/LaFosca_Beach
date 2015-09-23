@@ -41,6 +41,11 @@
         android:id="@+id/kidsTV"
         android:paddingTop="10px"
         android:paddingLeft="10px"/>
+    <ListView
+        android:id="@+id/kid_list"
+        android:layout_width="match_parent"
+        android:layout_height="250dp" >
+    </ListView>
     <Button
         android:id="@+id/clean_button"
         android:layout_width="72dip"
