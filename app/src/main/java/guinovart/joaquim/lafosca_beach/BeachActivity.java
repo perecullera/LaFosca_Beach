@@ -6,11 +6,14 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -32,6 +35,7 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
 
     ListView list;
     KidsAdapter adapter;
+    EditText inputSearch;
 
 
     Button openBttn;
@@ -51,6 +55,7 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
         kidsTW = (TextView) findViewById(R.id.kidsTV);
 
         list = (ListView) findViewById(R.id.kid_list);
+        inputSearch = (EditText) findViewById(R.id.inputSearch);
 
         openBttn = (Button) findViewById(R.id.close_button);
         cleanBttn = (Button) findViewById(R.id.clean_button);
@@ -141,6 +146,8 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
         kidsTW.setText("Kids");
         kidsTW.setVisibility(View.VISIBLE);
         getKids(beach);
+        list.setVisibility(View.VISIBLE);
+        inputSearch.setVisibility(View.VISIBLE);
         happinessTW.setText("Happiness: " + Integer.toString(beach.happiness));
         happinessTW.setVisibility(View.VISIBLE);
         dirtinessTW.setText("Dirtiness: " + Integer.toString(beach.dirtiness));
@@ -155,12 +162,34 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
         happinessTW.setVisibility(View.GONE);
         dirtinessTW.setVisibility(View.GONE);
         kidsTW.setVisibility(View.GONE);
+        list.setVisibility(View.GONE);
+        inputSearch.setVisibility(View.GONE);
         openBttn.setText("OPEN");
         cleanBttn.setVisibility(View.VISIBLE);
         niveaBttn.setVisibility(View.GONE);
     }
     public void getKids(Beach beach){
         adapter = new KidsAdapter(this,beach.kids);
+        inputSearch.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void afterTextChanged(Editable arg0) {
+                String text = inputSearch.getText().toString().toLowerCase();
+                adapter.filter(text);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1,
+                                          int arg2, int arg3) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence arg0, int arg1, int arg2,
+                                      int arg3) {
+
+            }
+        });
         list.setAdapter(adapter);
     }
     @Override

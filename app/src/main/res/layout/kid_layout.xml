@@ -7,7 +7,7 @@
         android:id="@+id/nameTW"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:padding="10dip"
+        android:padding="1dip"
         android:textSize="13dip"
          >
     </TextView>
@@ -16,7 +16,7 @@
         android:id="@+id/ageTW"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:padding="10dip"
+        android:padding="1dip"
         android:textSize="13dip">
     </TextView>
 

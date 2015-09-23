@@ -41,10 +41,17 @@
         android:id="@+id/kidsTV"
         android:paddingTop="10px"
         android:paddingLeft="10px"/>
+    <!-- Editext for Search -->
+    <EditText android:id="@+id/inputSearch"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Search kids.."
+        />
+
     <ListView
         android:id="@+id/kid_list"
         android:layout_width="match_parent"
-        android:layout_height="250dp" >
+        android:layout_height="200dp" >
     </ListView>
     <Button
         android:id="@+id/clean_button"

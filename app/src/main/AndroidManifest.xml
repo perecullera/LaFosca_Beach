@@ -20,7 +20,8 @@
         </activity>
         <activity
             android:name=".BeachActivity"
-            android:label="@string/title_activity_beach" >
+            android:label="@string/title_activity_beach"
+            android:windowSoftInputMode="stateHidden">
         </activity>
     </application>
 

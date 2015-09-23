@@ -6,4 +6,8 @@ package guinovart.joaquim.lafosca_beach.Models;
 public class Kid {
     public String name;
     public int age;
+
+    public String getName() {
+        return name;
+    }
 }
