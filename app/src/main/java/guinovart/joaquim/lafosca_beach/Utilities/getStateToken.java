@@ -58,37 +58,23 @@ public class getStateToken extends AsyncTask<String, Void, String[]> {
 
             // Starts the query
             conn.connect();
-            int response = conn.getResponseCode();
-            StringBuilder sb;
-            if (response == HttpURLConnection.HTTP_OK) {
-                Log.d("AsyncTask " + params[0], " The response is: " + response);
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                sb = new StringBuilder();
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line+"\n");
-                }
-                br.close();
-                result[0]= String.valueOf(response);
-                result[1]= sb.toString();
-                return result;
-            } else {
-                Log.d("AsyncTask " + params[0], " The BAD response is: " + response);
-                result[0]= String.valueOf(response);
-                result[1]= null;
-                return result;
-            }
+
+            result = returnResponse(conn);
+            return result;
+
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        result[0]= "000"; //TODO
+        result[1]= null;
+        return result;
     }
     @Override
     protected void onPostExecute(String[] result) {
         super.onPostExecute(result);
         if(result[0]!= null){
-            Log.d("Postexecute resultn ", result[0]);
+            Log.d("Postexecute result ", result[0]);
             Toast.makeText(context, "response " + result[0] + " result " + result[1], Toast.LENGTH_SHORT).show();
             Toast.makeText(context, "Beach Opened", Toast.LENGTH_SHORT).show();
             // Convert String to json object
@@ -104,6 +90,7 @@ public class getStateToken extends AsyncTask<String, Void, String[]> {
                     Beach beach = new Beach("close");
                     listener.onTaskCompleted(beach);
                 }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -116,6 +103,32 @@ public class getStateToken extends AsyncTask<String, Void, String[]> {
     }
 
     private void beachToUi(Beach beach) {
+
+    }
+
+    private String[] returnResponse(HttpURLConnection conn) throws IOException {
+        String[] result = new String[2];
+        int response = conn.getResponseCode();
+        StringBuilder sb;
+        if (response == HttpURLConnection.HTTP_OK) {
+            //Log.d("AsyncTask " + params[0], " The response is: " + response);
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            sb = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line+"\n");
+            }
+            br.close();
+            result[0]= String.valueOf(response);
+            result[1]= sb.toString();
+            return result;
+        } else {
+            //Log.d("AsyncTask " + params[0], " The BAD response is: " + response);
+            result[0]= String.valueOf(response);
+            result[1]= null;
+            return result;
+        }
+
 
     }
 

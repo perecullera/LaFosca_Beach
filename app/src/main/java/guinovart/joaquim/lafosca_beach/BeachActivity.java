@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import guinovart.joaquim.lafosca_beach.Models.Beach;
 import guinovart.joaquim.lafosca_beach.Utilities.KidsAdapter;
-import guinovart.joaquim.lafosca_beach.Utilities.getStateToken;
 import guinovart.joaquim.lafosca_beach.Utilities.putPostToken;
 
 
@@ -68,7 +67,7 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
             Intent i = new Intent(this,MainActivity.class);
             startActivity(i);
         }else{
-            getStateToken GSTTask = new getStateToken(auth_token_string,this,this);
+            putPostToken GSTTask = new putPostToken(auth_token_string,this,this,"state");
             GSTTask.execute(baseUrl+"/state");
         }
     }
