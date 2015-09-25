@@ -174,8 +174,7 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
 
             @Override
             public void afterTextChanged(Editable arg0) {
-                String text = inputSearch.getText().toString().toLowerCase();
-                adapter.filter(text);
+
             }
 
             @Override
@@ -187,6 +186,8 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
             @Override
             public void onTextChanged(CharSequence arg0, int arg1, int arg2,
                                       int arg3) {
+                String text = arg0.toString().toLowerCase();
+                adapter.filter(text);
 
             }
         });

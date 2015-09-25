@@ -22,8 +22,8 @@ public class KidsAdapter extends BaseAdapter {
     private final LayoutInflater inflater;
     Context context;
 
-    private ArrayList<Kid> arraylist;
-    private List<Kid> kidList;
+    private  List <Kid> arraylist;
+    private ArrayList<Kid> kidList;
 
     public KidsAdapter(Context context, ArrayList<Kid> kids) {
         this.context=context;
@@ -71,7 +71,7 @@ public class KidsAdapter extends BaseAdapter {
         {
             for (Kid kid : kidList)
             {
-                if (kid.getName().toLowerCase(Locale.getDefault()).contains(charText))
+                if (kid.getName().toLowerCase(Locale.getDefault()).startsWith(charText))
                 {
                     arraylist.add(kid);
                 }
