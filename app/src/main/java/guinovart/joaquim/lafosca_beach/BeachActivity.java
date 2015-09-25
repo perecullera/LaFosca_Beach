@@ -1,5 +1,7 @@
 package guinovart.joaquim.lafosca_beach;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -40,6 +42,9 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
     Button openBttn;
     Button cleanBttn;
     Button niveaBttn;
+    Button flagBttn;
+
+    Beach beach;
 
 
     @Override
@@ -59,6 +64,7 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
         openBttn = (Button) findViewById(R.id.close_button);
         cleanBttn = (Button) findViewById(R.id.clean_button);
         niveaBttn = (Button) findViewById(R.id.nivea_button);
+        flagBttn = (Button) findViewById(R.id.flag_button);
 
 
         String auth_token_string = getToken();
@@ -119,6 +125,22 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
             url = baseUrl+"/nivea-rain";
         }
         PCTTask.execute(url);
+    }
+    public void changeFlag(View V){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose flag colour");
+        builder.setItems(R.array.colors_array, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                String token = getToken();
+                putPostToken PCTTask = new putPostToken(token,BeachActivity.this,BeachActivity.this,"flag",item);
+                String url = null;
+                url = baseUrl+"/flag";
+                PCTTask.execute(url);
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+
     }
     public String getToken (){
         String token = null;
@@ -194,6 +216,7 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
     }
     @Override
     public void onTaskCompleted(Beach beach) {
+        this.beach=beach;
         if (beach.state.equals("open")) {
             openBeach(beach);
         } else {
