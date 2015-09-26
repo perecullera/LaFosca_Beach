@@ -10,6 +10,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import guinovart.joaquim.lafosca_beach.Models.Kid;
@@ -24,7 +25,8 @@ public class KidsAdapter extends BaseAdapter implements Filterable {
     private List<Kid>filteredData = null;
     private LayoutInflater mInflater;
 
-    public KidsAdapter(Context context, ArrayList<Kid> kids) {
+    public KidsAdapter(Context context, List<Kid> kids) {
+        Collections.sort(kids, new KidComparator());
         this.filteredData = kids ;
         this.originalData = kids ;
         mInflater = LayoutInflater.from(context);
