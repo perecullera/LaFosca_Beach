@@ -1,6 +1,8 @@
 package guinovart.joaquim.lafosca_beach.Utilities;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -61,52 +63,65 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
         HttpURLConnection conn;
         InputStream is = null;
         String [] result = new String[2];
-        //String[] result = new String[2];
-        try {
-            Log.d("Entering ", "AsyncTask");
-            URL url = new URL(params[0]);
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("Accept", "application/json");
-            String tokenST = "Token token=" + "\"" + token + "\"";
-            Log.d("token string :", tokenST);
-            conn.setRequestProperty("Authorization", tokenST);
 
-            if (method.equalsIgnoreCase("open")||method.equalsIgnoreCase("close")) {
-                conn.setRequestMethod("PUT");
-                conn.setDoInput(true);
-            } else if (method.equalsIgnoreCase("clean")||method.equalsIgnoreCase("nivea")) {
-                conn.setRequestMethod("POST");
-                conn.setDoInput(true);
-            }else if(method.equalsIgnoreCase("state")){
-                conn.setRequestMethod("GET");
-                conn.setDoInput(true);
-            }else if(method.equalsIgnoreCase("flag")){
-                conn.setRequestMethod("PUT");
-                JSONObject cred   = new JSONObject();
-                cred.put("flag",flag);
-                putRequestHeader(conn,cred);
+        if (checkConnectivity()) {
+            try {
+                Log.d("Entering ", "AsyncTask");
+                URL url = new URL(params[0]);
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                String tokenST = "Token token=" + "\"" + token + "\"";
+                Log.d("token string :", tokenST);
+                conn.setRequestProperty("Authorization", tokenST);
+
+                if (method.equalsIgnoreCase("open")||method.equalsIgnoreCase("close")) {
+                    conn.setRequestMethod("PUT");
+                    conn.setDoInput(true);
+                } else if (method.equalsIgnoreCase("clean")||method.equalsIgnoreCase("nivea")) {
+                    conn.setRequestMethod("POST");
+                    conn.setDoInput(true);
+                }else if(method.equalsIgnoreCase("state")){
+                    conn.setRequestMethod("GET");
+                    conn.setDoInput(true);
+                }else if(method.equalsIgnoreCase("flag")){
+                    conn.setRequestMethod("PUT");
+                    JSONObject cred   = new JSONObject();
+                    cred.put("flag",flag);
+                    putRequestHeader(conn,cred);
+                }
+
+
+
+                // Starts the query
+                conn.connect();
+                //result = conn.getResponseCode();
+                result = returnResponse(conn);
+
+            }catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-
-
-
-            // Starts the query
-            conn.connect();
-            //result = conn.getResponseCode();
-            result = returnResponse(conn);
-
-        }catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
+            return result;
+        } else {
+            result[0] = "0";
+            result[1] = null;
+            return result;
         }
-        return result;
     }
 
+    private boolean checkConnectivity() {
+        ConnectivityManager cm =
+                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
 
 
     @Override
@@ -148,8 +163,10 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
                 Toast.makeText(context, "Beach cleaned", Toast.LENGTH_SHORT).show();
                 runState();
             }
-        }else {
-            Toast.makeText(context, "response "+ result, Toast.LENGTH_SHORT).show();
+        }else if (result[0].equals("0")){
+            Toast.makeText(context, "Device not connected to Internet ", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(context, "Something went wrong with response:  "+ result, Toast.LENGTH_SHORT).show();
         }
 
     }
