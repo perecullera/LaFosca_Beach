@@ -71,20 +71,23 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
                 conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("Accept", "application/json");
-                String tokenST = "Token token=" + "\"" + token + "\"";
-                Log.d("token string :", tokenST);
-                conn.setRequestProperty("Authorization", tokenST);
 
                 if (method.equalsIgnoreCase("open")||method.equalsIgnoreCase("close")) {
+                    putToken(conn);
                     conn.setRequestMethod("PUT");
                     conn.setDoInput(true);
+                }else if(method.equalsIgnoreCase("signIn")){
+
                 } else if (method.equalsIgnoreCase("clean")||method.equalsIgnoreCase("nivea")) {
+                    putToken(conn);
                     conn.setRequestMethod("POST");
                     conn.setDoInput(true);
                 }else if(method.equalsIgnoreCase("state")){
+                    putToken(conn);
                     conn.setRequestMethod("GET");
                     conn.setDoInput(true);
                 }else if(method.equalsIgnoreCase("flag")){
+                    putToken(conn);
                     conn.setRequestMethod("PUT");
                     JSONObject cred   = new JSONObject();
                     cred.put("flag",flag);
@@ -130,18 +133,18 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
         if(result[0].equalsIgnoreCase(Integer.toString(HttpURLConnection.HTTP_OK))||result[0].equalsIgnoreCase(Integer.toString(HttpURLConnection.HTTP_CREATED))||
                 result[0].equalsIgnoreCase(Integer.toString(HttpURLConnection.HTTP_NO_CONTENT))
                 ){
-            if(method.equalsIgnoreCase("state")){
-            // Convert String to json object
+            if(method.equalsIgnoreCase("state")) {
+                // Convert String to json object
                 JSONObject json = null;
                 String state = "";
                 try {
                     json = new JSONObject(result[1]);
-                    state=json.getString("state");
-                    if (state.equals("open")){
+                    state = json.getString("state");
+                    if (state.equals("open")) {
                         Beach beach = parseBeach(result[1]);
                         Toast.makeText(context, "Beach opened", Toast.LENGTH_SHORT).show();
                         //beachToUi(beach);
-                    }else{
+                    } else {
                         Beach beach = new Beach("close");
                         listener.onTaskCompleted(beach);
                         Toast.makeText(context, "Beach closed", Toast.LENGTH_SHORT).show();
@@ -149,6 +152,8 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }else if(method.equalsIgnoreCase("signIn")){
+
             }else if (method.equalsIgnoreCase("clean")){
                 Toast.makeText(context, "Beach Cleaned", Toast.LENGTH_SHORT).show();
             }else if(method.equalsIgnoreCase("nivea")){
@@ -232,8 +237,11 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
             result[1]= null;
             return result;
         }
-
-
+    }
+    private void putToken(HttpURLConnection conn){
+        String tokenST = "Token token=" + "\"" + token + "\"";
+        Log.d("token string :", tokenST);
+        conn.setRequestProperty("Authorization", tokenST);
     }
     private void runState(){
         putPostToken GSTTask = new putPostToken(token,context,listener,"state");
