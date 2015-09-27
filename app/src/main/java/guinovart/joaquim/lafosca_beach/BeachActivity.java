@@ -223,4 +223,10 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
             closeBeach(beach);
         }
     }
+
+    //empty method, we're not using this in this activity
+    @Override
+    public void onTaskCompleted(String token) {
+
+    }
 }

@@ -1,6 +1,9 @@
 package guinovart.joaquim.lafosca_beach;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -13,11 +16,12 @@ import org.json.JSONException;
 
 import java.io.IOException;
 
-import guinovart.joaquim.lafosca_beach.Utilities.UserPostNoAuth;
+import guinovart.joaquim.lafosca_beach.Models.Beach;
 import guinovart.joaquim.lafosca_beach.Utilities.getUserBAuth;
+import guinovart.joaquim.lafosca_beach.Utilities.putPostToken;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements OnTaskCompleted{
 
     String baseUrl = "http://lafosca-beach.herokuapp.com/api/v1";
 
@@ -39,9 +43,10 @@ public class MainActivity extends ActionBarActivity {
         if (!user.equals("") && !pwd.equals("")) {
             Log.d("User text ", String.valueOf(userTV.getText()));
             Log.d("PWD text ", String.valueOf(pwdTV.getText()));
-            UserPostNoAuth USPNATask = new UserPostNoAuth(user, pwd, MainActivity.this);
+            putPostToken GUBA = new putPostToken(MainActivity.this,
+                    this, "signIn",user,pwd);
             String userUrl = baseUrl + "/users";
-            USPNATask.execute(userUrl);
+            GUBA.execute(userUrl);
         } else {
             Toast.makeText(this, "Please, add a user and a pwd", Toast.LENGTH_SHORT).show();
         }
@@ -84,5 +89,25 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onTaskCompleted(Beach beach) {
+
+    }
+
+    @Override
+    public void onTaskCompleted(String token) {
+        putToken(token);
+        Intent i = new Intent(this,BeachActivity.class);
+        this.startActivity(i);
+    }
+
+    private void putToken(String token) {
+        SharedPreferences settings = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("token", token);
+        editor.commit();
     }
 }

@@ -41,7 +41,19 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
     String method;
     int flag;
 
+    String username;
+    String password;
+
     private OnTaskCompleted listener;
+
+    //constructor for post with no auth
+    public putPostToken(Context c, OnTaskCompleted listener, String method, String user, String pwd) {
+        this.context = c;
+        this.listener=listener;
+        this.method = method;
+        this.username = user;
+        this.password = pwd;
+    }
 
     public putPostToken(String token, Context c, OnTaskCompleted listener, String method) {
         this.token = token;
@@ -77,7 +89,13 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
                     conn.setRequestMethod("PUT");
                     conn.setDoInput(true);
                 }else if(method.equalsIgnoreCase("signIn")){
-
+                    JSONObject cred   = new JSONObject();
+                    cred.put("username",username);
+                    cred.put("password", password);
+                    conn.setRequestMethod("POST");
+                    conn.setDoInput(true);
+                    conn.setDoOutput(true);
+                    putRequestHeader(conn, cred);
                 } else if (method.equalsIgnoreCase("clean")||method.equalsIgnoreCase("nivea")) {
                     putToken(conn);
                     conn.setRequestMethod("POST");
@@ -153,6 +171,19 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
                     e.printStackTrace();
                 }
             }else if(method.equalsIgnoreCase("signIn")){
+                // Convert String to json object
+                JSONObject json = null;
+                String user = "";
+                String token = "";
+                try {
+                    json = new JSONObject(result[1]);
+                    user = json.getString("username");
+                    token = json.getString("authentication_token");
+                    listener.onTaskCompleted(token);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Toast.makeText(context, "User created: " + user+ "\n with token: "+ token, Toast.LENGTH_SHORT).show();
 
             }else if (method.equalsIgnoreCase("clean")){
                 Toast.makeText(context, "Beach Cleaned", Toast.LENGTH_SHORT).show();
@@ -171,7 +202,7 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
         }else if (result[0].equals("0")){
             Toast.makeText(context, "Device not connected to Internet ", Toast.LENGTH_SHORT).show();
         }else{
-            Toast.makeText(context, "Something went wrong with response:  "+ result, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Something went wrong with response:  "+ result[0], Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -219,7 +250,7 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
         String[] result = new String[2];
         int response = conn.getResponseCode();
         StringBuilder sb;
-        if (response == HttpURLConnection.HTTP_OK) {
+        if (response == HttpURLConnection.HTTP_OK||response == HttpURLConnection.HTTP_CREATED) {
             //Log.d("AsyncTask " + params[0], " The response is: " + response);
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             sb = new StringBuilder();
