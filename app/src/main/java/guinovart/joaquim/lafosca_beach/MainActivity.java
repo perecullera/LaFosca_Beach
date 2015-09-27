@@ -17,7 +17,7 @@ import org.json.JSONException;
 import java.io.IOException;
 
 import guinovart.joaquim.lafosca_beach.Models.Beach;
-import guinovart.joaquim.lafosca_beach.Utilities.putPostToken;
+import guinovart.joaquim.lafosca_beach.Utilities.beachAsyncT;
 
 
 public class MainActivity extends ActionBarActivity implements OnTaskCompleted{
@@ -42,7 +42,7 @@ public class MainActivity extends ActionBarActivity implements OnTaskCompleted{
         if (!user.equals("") && !pwd.equals("")) {
             Log.d("User text ", String.valueOf(userTV.getText()));
             Log.d("PWD text ", String.valueOf(pwdTV.getText()));
-            putPostToken GUBA = new putPostToken(MainActivity.this,
+            beachAsyncT GUBA = new beachAsyncT(MainActivity.this,
                     this, "signIn",user,pwd);
             String userUrl = baseUrl + "/users";
             GUBA.execute(userUrl);
@@ -59,7 +59,7 @@ public class MainActivity extends ActionBarActivity implements OnTaskCompleted{
         if (!user.equals("") && !pwd.equals("")) {
             Log.d("User login text ", user);
             Log.d("PWD login text ", pwd);
-            putPostToken GUBA = new putPostToken(MainActivity.this,
+            beachAsyncT GUBA = new beachAsyncT(MainActivity.this,
                     this, "logIn",user,pwd);
             String userUrl = baseUrl + "/user";
             GUBA.execute(userUrl);

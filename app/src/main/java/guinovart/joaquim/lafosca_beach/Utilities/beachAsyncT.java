@@ -32,9 +32,9 @@ import guinovart.joaquim.lafosca_beach.OnTaskCompleted;
 /**
  * Created by perecullera on 22/9/15.
  */
-public class putPostToken extends AsyncTask<String, Integer, String[]> {
+public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
 
-    Beach beachUI;
+    //Beach beachUI;
     String baseUrl = "http://lafosca-beach.herokuapp.com/api/v1";
 
     String token;
@@ -48,7 +48,7 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
     private OnTaskCompleted listener;
 
     //constructor for post with no auth
-    public putPostToken(Context c, OnTaskCompleted listener, String method, String user, String pwd) {
+    public beachAsyncT(Context c, OnTaskCompleted listener, String method, String user, String pwd) {
         this.context = c;
         this.listener=listener;
         this.method = method;
@@ -56,14 +56,14 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
         this.password = pwd;
     }
 
-    public putPostToken(String token, Context c, OnTaskCompleted listener, String method) {
+    public beachAsyncT(String token, Context c, OnTaskCompleted listener, String method) {
         this.token = token;
         this.context = c;
         this.listener=listener;
         this.method = method;
     }
 
-    public putPostToken(String token, Context c, OnTaskCompleted listener, String method,int flag) {
+    public beachAsyncT(String token, Context c, OnTaskCompleted listener, String method, int flag) {
         this.token = token;
         this.context = c;
         this.listener=listener;
@@ -115,10 +115,7 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
                     cred.put("flag",flag);
                     putRequestHeader(conn,cred);
                 }
-
-
-
-                // Starts the query
+                 // Starts the query
                 conn.connect();
                 //result = conn.getResponseCode();
                 result = returnResponse(conn);
@@ -165,7 +162,6 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
                     if (state.equals("open")) {
                         Beach beach = parseBeach(result[1]);
                         Toast.makeText(context, "Beach opened", Toast.LENGTH_SHORT).show();
-                        //beachToUi(beach);
                     } else {
                         Beach beach = new Beach("close");
                         listener.onTaskCompleted(beach);
@@ -203,7 +199,7 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
                 Beach beach = new Beach("close");
                 listener.onTaskCompleted(beach);
             }else if (method.equalsIgnoreCase("flag")){
-                Toast.makeText(context, "Beach cleaned", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Flag changed", Toast.LENGTH_SHORT).show();
                 runState();
             }
         }else if (result[0].equals("0")){
@@ -282,7 +278,7 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
         conn.setRequestProperty("Authorization", tokenST);
     }
     private void runState(){
-        putPostToken GSTTask = new putPostToken(token,context,listener,"state");
+        beachAsyncT GSTTask = new beachAsyncT(token,context,listener,"state");
         GSTTask.execute(baseUrl+"/state");
     }
 

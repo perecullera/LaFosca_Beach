@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import guinovart.joaquim.lafosca_beach.Models.Beach;
 import guinovart.joaquim.lafosca_beach.Utilities.KidsAdapter;
-import guinovart.joaquim.lafosca_beach.Utilities.putPostToken;
+import guinovart.joaquim.lafosca_beach.Utilities.beachAsyncT;
 
 
 public class BeachActivity extends ActionBarActivity implements OnTaskCompleted {
@@ -73,7 +73,7 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
             Intent i = new Intent(this,MainActivity.class);
             startActivity(i);
         }else{
-            putPostToken GSTTask = new putPostToken(auth_token_string,this,this,"state");
+            beachAsyncT GSTTask = new beachAsyncT(auth_token_string,this,this,"state");
             GSTTask.execute(baseUrl+"/state");
         }
     }
@@ -107,21 +107,21 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
         //TextView textV = (TextView) v;
         String text = ((Button)v).getText().toString();
         String token = getToken();
-        putPostToken PCTTask = null;
+        beachAsyncT PCTTask = null;
         String url = null;
         if(text.equalsIgnoreCase("OPEN")){
-            PCTTask = new putPostToken(token,this,this,"open");
+            PCTTask = new beachAsyncT(token,this,this,"open");
             url = baseUrl+"/open";
 
         }else if(text.equalsIgnoreCase("CLOSE")){
-            PCTTask = new putPostToken(token,this,this,"close");
+            PCTTask = new beachAsyncT(token,this,this,"close");
             url = baseUrl+"/close";
 
         }else if(text.equalsIgnoreCase("CLEAN")){
-            PCTTask = new putPostToken(token,this,this,"clean");
+            PCTTask = new beachAsyncT(token,this,this,"clean");
             url = baseUrl+"/clean";
         }else if(text.equalsIgnoreCase("NIVEA")){
-            PCTTask = new putPostToken(token,this,this,"nivea");
+            PCTTask = new beachAsyncT(token,this,this,"nivea");
             url = baseUrl+"/nivea-rain";
         }
         PCTTask.execute(url);
@@ -132,7 +132,7 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
         builder.setItems(R.array.colors_array, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
                 String token = getToken();
-                putPostToken PCTTask = new putPostToken(token,BeachActivity.this,BeachActivity.this,"flag",item);
+                beachAsyncT PCTTask = new beachAsyncT(token,BeachActivity.this,BeachActivity.this,"flag",item);
                 String url = null;
                 url = baseUrl+"/flag";
                 PCTTask.execute(url);
