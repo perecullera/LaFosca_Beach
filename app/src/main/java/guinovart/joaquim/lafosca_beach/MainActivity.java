@@ -17,7 +17,6 @@ import org.json.JSONException;
 import java.io.IOException;
 
 import guinovart.joaquim.lafosca_beach.Models.Beach;
-import guinovart.joaquim.lafosca_beach.Utilities.getUserBAuth;
 import guinovart.joaquim.lafosca_beach.Utilities.putPostToken;
 
 
@@ -60,7 +59,8 @@ public class MainActivity extends ActionBarActivity implements OnTaskCompleted{
         if (!user.equals("") && !pwd.equals("")) {
             Log.d("User login text ", user);
             Log.d("PWD login text ", pwd);
-            getUserBAuth GUBA = new getUserBAuth(user, pwd, MainActivity.this);
+            putPostToken GUBA = new putPostToken(MainActivity.this,
+                    this, "logIn",user,pwd);
             String userUrl = baseUrl + "/user";
             GUBA.execute(userUrl);
         } else {

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -96,6 +97,9 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
                     conn.setDoInput(true);
                     conn.setDoOutput(true);
                     putRequestHeader(conn, cred);
+                }else if(method.equalsIgnoreCase("logIn")){
+                    final String basicAuth = "Basic " + Base64.encodeToString((username + ":" + password).getBytes(), Base64.DEFAULT);
+                    conn.setRequestProperty("Authorization", basicAuth);
                 } else if (method.equalsIgnoreCase("clean")||method.equalsIgnoreCase("nivea")) {
                     putToken(conn);
                     conn.setRequestMethod("POST");
@@ -170,7 +174,7 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            }else if(method.equalsIgnoreCase("signIn")){
+            }else if(method.equalsIgnoreCase("signIn")||method.equalsIgnoreCase("logIn")){
                 // Convert String to json object
                 JSONObject json = null;
                 String user = "";
@@ -183,8 +187,11 @@ public class putPostToken extends AsyncTask<String, Integer, String[]> {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Toast.makeText(context, "User created: " + user+ "\n with token: "+ token, Toast.LENGTH_SHORT).show();
+                if(method.equalsIgnoreCase("signIn")){
+                    Toast.makeText(context, "User created: " + user, Toast.LENGTH_SHORT).show();
+                }else{
 
+                }
             }else if (method.equalsIgnoreCase("clean")){
                 Toast.makeText(context, "Beach Cleaned", Toast.LENGTH_SHORT).show();
             }else if(method.equalsIgnoreCase("nivea")){
