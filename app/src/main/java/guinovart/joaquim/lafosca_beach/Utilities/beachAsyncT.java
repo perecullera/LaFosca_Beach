@@ -5,7 +5,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Base64;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -34,20 +33,24 @@ import guinovart.joaquim.lafosca_beach.OnTaskCompleted;
  */
 public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
 
-    //Beach beachUI;
+    //Base url to API
     String baseUrl = "http://lafosca-beach.herokuapp.com/api/v1";
 
+    //Atributs
     String token;
     Context context;
+    //request method to API
     String method;
+    //0:green 1:yellow 2:red.
     int flag;
-
+    //username ans password passed in Constructor for sigIn
     String username;
     String password;
 
+    //listener to pass Object to Activity
     private OnTaskCompleted listener;
 
-    //constructor for post with no auth
+    //constructor for post with no auth and BasicAuth
     public beachAsyncT(Context c, OnTaskCompleted listener, String method, String user, String pwd) {
         this.context = c;
         this.listener=listener;
@@ -55,14 +58,14 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
         this.username = user;
         this.password = pwd;
     }
-
+    //constructor for clean/state/open/close/nivea requests
     public beachAsyncT(String token, Context c, OnTaskCompleted listener, String method) {
         this.token = token;
         this.context = c;
         this.listener=listener;
         this.method = method;
     }
-
+    //constructor for flah request
     public beachAsyncT(String token, Context c, OnTaskCompleted listener, String method, int flag) {
         this.token = token;
         this.context = c;
@@ -76,19 +79,21 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
         HttpURLConnection conn;
         InputStream is = null;
         String [] result = new String[2];
-
+        /* check if device is connected to Internet, if it isn't we don't do connection */
         if (checkConnectivity()) {
             try {
-                Log.d("Entering ", "AsyncTask");
+
+                //common  request properties
                 URL url = new URL(params[0]);
                 conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("Accept", "application/json");
-
+                //put method and token for open/close
                 if (method.equalsIgnoreCase("open")||method.equalsIgnoreCase("close")) {
                     putToken(conn);
                     conn.setRequestMethod("PUT");
                     conn.setDoInput(true);
+                //put method and token and user-pwd header with constructor passed values
                 }else if(method.equalsIgnoreCase("signIn")){
                     JSONObject cred   = new JSONObject();
                     cred.put("username",username);
@@ -97,17 +102,21 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
                     conn.setDoInput(true);
                     conn.setDoOutput(true);
                     putRequestHeader(conn, cred);
+                //put method and BasicAuth with user-pwd passed by constructor
                 }else if(method.equalsIgnoreCase("logIn")){
                     final String basicAuth = "Basic " + Base64.encodeToString((username + ":" + password).getBytes(), Base64.DEFAULT);
                     conn.setRequestProperty("Authorization", basicAuth);
+                //put method and token to clean/nivea cases
                 } else if (method.equalsIgnoreCase("clean")||method.equalsIgnoreCase("nivea")) {
                     putToken(conn);
                     conn.setRequestMethod("POST");
                     conn.setDoInput(true);
+                //put method and token for state case
                 }else if(method.equalsIgnoreCase("state")){
                     putToken(conn);
                     conn.setRequestMethod("GET");
                     conn.setDoInput(true);
+                //put method and token and flag header for flag case
                 }else if(method.equalsIgnoreCase("flag")){
                     putToken(conn);
                     conn.setRequestMethod("PUT");
@@ -115,11 +124,11 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
                     cred.put("flag",flag);
                     putRequestHeader(conn,cred);
                 }
-                 // Starts the query
+                // Starts the query
                 conn.connect();
-                //result = conn.getResponseCode();
+                //get response
                 result = returnResponse(conn);
-
+            //pass exceptions to OnPostExecute()
             }catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (ProtocolException e) {
@@ -131,12 +140,15 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
             }
             return result;
         } else {
+            //if device not connected to Internet
+            // we pass response 0 to control on OnPostExecute
             result[0] = "0";
             result[1] = null;
             return result;
         }
     }
 
+    //check Connectivity: False not connected, True connected
     private boolean checkConnectivity() {
         ConnectivityManager cm =
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -149,9 +161,11 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
     @Override
     protected void onPostExecute(String[] result){
         super.onPostExecute(result);
+        //Succes for all methods
         if(result[0].equalsIgnoreCase(Integer.toString(HttpURLConnection.HTTP_OK))||result[0].equalsIgnoreCase(Integer.toString(HttpURLConnection.HTTP_CREATED))||
                 result[0].equalsIgnoreCase(Integer.toString(HttpURLConnection.HTTP_NO_CONTENT))
                 ){
+            //success for state request, parse Beach an pass to activity through listener
             if(method.equalsIgnoreCase("state")) {
                 // Convert String to json object
                 JSONObject json = null;
@@ -159,8 +173,10 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
                 try {
                     json = new JSONObject(result[1]);
                     state = json.getString("state");
+
                     if (state.equals("open")) {
                         Beach beach = parseBeach(result[1]);
+                        listener.onTaskCompleted(beach);
                         Toast.makeText(context, "Beach opened", Toast.LENGTH_SHORT).show();
                     } else {
                         Beach beach = new Beach("close");
@@ -170,6 +186,7 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            //Succes on sigIn and logIn,, get the user and output from response
             }else if(method.equalsIgnoreCase("signIn")||method.equalsIgnoreCase("logIn")){
                 // Convert String to json object
                 JSONObject json = null;
@@ -186,31 +203,39 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
                 if(method.equalsIgnoreCase("signIn")){
                     Toast.makeText(context, "User created: " + user, Toast.LENGTH_SHORT).show();
                 }else{
-
+                    Toast.makeText(context, "User logged: " + user, Toast.LENGTH_SHORT).show();
                 }
+            //Success on clean method, Toast to inform user action done
             }else if (method.equalsIgnoreCase("clean")){
                 Toast.makeText(context, "Beach Cleaned", Toast.LENGTH_SHORT).show();
+            //Succes to nivea method, Toast to inform user and refresh Beach values with state request
             }else if(method.equalsIgnoreCase("nivea")){
                 Toast.makeText(context, "Happiness spreaded", Toast.LENGTH_SHORT).show();
                 runState();
+            //Succes to open method, Toast to inform user and refresh Beach values with state request
             }else if (method.equalsIgnoreCase("open")){
+                Toast.makeText(context, "Beach open", Toast.LENGTH_SHORT).show();
                 runState();
+            //Succes to close method, Toast to inform user and refresh Beach values with state request
             }else if (method.equalsIgnoreCase("close")){
                 Beach beach = new Beach("close");
                 listener.onTaskCompleted(beach);
                 Toast.makeText(context, "Beach Closed", Toast.LENGTH_SHORT).show();
+            //Succes to flag method, Toast to inform user and refresh Beach values with state request
             }else if (method.equalsIgnoreCase("flag")){
                 Toast.makeText(context, "Flag changed", Toast.LENGTH_SHORT).show();
                 runState();
             }
+        //Toast for not connected
         }else if (result[0].equals("0")){
             Toast.makeText(context, "Device not connected to Internet ", Toast.LENGTH_SHORT).show();
+        //
         }else{
             Toast.makeText(context, "Something went wrong with response:  "+ result[0], Toast.LENGTH_SHORT).show();
         }
 
     }
-
+    //parsing JSON response for state method, return Beach object
     private Beach parseBeach(String s) {
         Beach beach = new Beach();
         JSONObject json = null;
@@ -229,14 +254,13 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
                 kid.age = kidObj.getInt("age");
                 beach.kids.add(kid);
             }
-            listener.onTaskCompleted(beach);
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return beach;
 
     }
+    //put JSON header to connection
     private void putRequestHeader(HttpURLConnection conn,JSONObject cred) {
         OutputStream os = null;
         try {
@@ -250,6 +274,7 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
         }
     }
 
+    //get response to server and return it on String result
     private String[] returnResponse(HttpURLConnection conn) throws IOException {
         String[] result = new String[2];
         int response = conn.getResponseCode();
@@ -273,11 +298,13 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
             return result;
         }
     }
+
+    //put token to request properties of connection
     private void putToken(HttpURLConnection conn){
         String tokenST = "Token token=" + "\"" + token + "\"";
-        Log.d("token string :", tokenST);
         conn.setRequestProperty("Authorization", tokenST);
     }
+    //run AsyncTask for refreshing Beach state
     private void runState(){
         beachAsyncT GSTTask = new beachAsyncT(token,context,listener,"state");
         GSTTask.execute(baseUrl+"/state");
