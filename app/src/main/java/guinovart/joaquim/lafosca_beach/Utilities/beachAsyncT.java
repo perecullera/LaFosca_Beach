@@ -214,7 +214,7 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
                 runState();
             //Succes to open method, Toast to inform user and refresh Beach values with state request
             }else if (method.equalsIgnoreCase("open")){
-                Toast.makeText(context, "Beach open", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, "Beach open", Toast.LENGTH_SHORT).show();
                 runState();
             //Succes to close method, Toast to inform user and refresh Beach values with state request
             }else if (method.equalsIgnoreCase("close")){
