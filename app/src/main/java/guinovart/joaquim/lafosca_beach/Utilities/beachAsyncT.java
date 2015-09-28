@@ -14,7 +14,6 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -77,7 +76,6 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
     @Override
     protected String[] doInBackground(String... params) {
         HttpURLConnection conn;
-        InputStream is = null;
         String [] result = new String[2];
         /* check if device is connected to Internet, if it isn't we don't do connection */
         if (checkConnectivity()) {
@@ -168,8 +166,8 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
             //success for state request, parse Beach an pass to activity through listener
             if(method.equalsIgnoreCase("state")) {
                 // Convert String to json object
-                JSONObject json = null;
-                String state = "";
+                JSONObject json;
+                String state;
                 try {
                     json = new JSONObject(result[1]);
                     state = json.getString("state");
@@ -177,11 +175,11 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
                     if (state.equals("open")) {
                         Beach beach = parseBeach(result[1]);
                         listener.onTaskCompleted(beach);
-                        Toast.makeText(context, "Beach opened", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "Beach opened", Toast.LENGTH_SHORT).show();
                     } else {
                         Beach beach = new Beach("close");
                         listener.onTaskCompleted(beach);
-                        Toast.makeText(context, "Beach closed", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "Beach closed", Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -189,9 +187,9 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
             //Succes on sigIn and logIn,, get the user and output from response
             }else if(method.equalsIgnoreCase("signIn")||method.equalsIgnoreCase("logIn")){
                 // Convert String to json object
-                JSONObject json = null;
+                JSONObject json;
                 String user = "";
-                String token = "";
+                String token;
                 try {
                     json = new JSONObject(result[1]);
                     user = json.getString("username");
@@ -214,7 +212,7 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
                 runState();
             //Succes to open method, Toast to inform user and refresh Beach values with state request
             }else if (method.equalsIgnoreCase("open")){
-                //Toast.makeText(context, "Beach open", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Beach open", Toast.LENGTH_SHORT).show();
                 runState();
             //Succes to close method, Toast to inform user and refresh Beach values with state request
             }else if (method.equalsIgnoreCase("close")){
@@ -238,7 +236,7 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
     //parsing JSON response for state method, return Beach object
     private Beach parseBeach(String s) {
         Beach beach = new Beach();
-        JSONObject json = null;
+        JSONObject json;
         try{
             json = new JSONObject(s);
             beach.state = json.getString("state");
@@ -262,7 +260,7 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
     }
     //put JSON header to connection
     private void putRequestHeader(HttpURLConnection conn,JSONObject cred) {
-        OutputStream os = null;
+        OutputStream os;
         try {
             os = conn.getOutputStream();
             BufferedWriter writer = new BufferedWriter(
