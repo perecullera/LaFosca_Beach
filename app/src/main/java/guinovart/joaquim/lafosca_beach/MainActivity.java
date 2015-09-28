@@ -38,31 +38,34 @@ public class MainActivity extends ActionBarActivity implements OnTaskCompleted{
     public void signIn(View v) throws IOException, JSONException {
         String user = userTV.getText().toString();
         String pwd = pwdTV.getText().toString();
-
+        //only pass if there's something diferent than "" on edittext
         if (!user.equals("") && !pwd.equals("")) {
             Log.d("User text ", String.valueOf(userTV.getText()));
             Log.d("PWD text ", String.valueOf(pwdTV.getText()));
-            beachAsyncT GUBA = new beachAsyncT(MainActivity.this,
+            //start aSyncTask with corresponent constructor and argumets
+            beachAsyncT aTask = new beachAsyncT(MainActivity.this,
                     this, "signIn",user,pwd);
             String userUrl = baseUrl + "/users";
-            GUBA.execute(userUrl);
+            aTask.execute(userUrl);
+        //No values on edittext, don't process action
         } else {
             Toast.makeText(this, "Please, add a user and a pwd", Toast.LENGTH_SHORT).show();
         }
-        //return response;
-
     }
 
     public void logIn(View v) {
         String user = userTV.getText().toString();
         String pwd = pwdTV.getText().toString();
+        //only pass i there's something diferent than "" on edittext
         if (!user.equals("") && !pwd.equals("")) {
             Log.d("User login text ", user);
             Log.d("PWD login text ", pwd);
+            //start aSyncTask with corresponent constructor and arguments
             beachAsyncT GUBA = new beachAsyncT(MainActivity.this,
                     this, "logIn",user,pwd);
             String userUrl = baseUrl + "/user";
             GUBA.execute(userUrl);
+        //only pass i there's something diferent than "" on edittext
         } else {
             Toast.makeText(this, "Please, add a user and a pwd", Toast.LENGTH_SHORT).show();
         }
@@ -93,9 +96,12 @@ public class MainActivity extends ActionBarActivity implements OnTaskCompleted{
 
     @Override
     public void onTaskCompleted(Beach beach) {
-
+        //not using this method in this activity
     }
 
+    //we get the token if the AsyncTask has completed succesfully,
+    // put the token in SharedPreferences
+    // and start beachActivity
     @Override
     public void onTaskCompleted(String token) {
         putToken(token);
@@ -103,6 +109,7 @@ public class MainActivity extends ActionBarActivity implements OnTaskCompleted{
         this.startActivity(i);
     }
 
+    // authentication_token saved on sharedpreferences with tag token
     private void putToken(String token) {
         SharedPreferences settings = PreferenceManager
                 .getDefaultSharedPreferences(this);
