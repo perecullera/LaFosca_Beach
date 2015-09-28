@@ -198,6 +198,7 @@ public class beachAsyncT extends AsyncTask<String, Integer, String[]> {
             }else if (method.equalsIgnoreCase("close")){
                 Beach beach = new Beach("close");
                 listener.onTaskCompleted(beach);
+                Toast.makeText(context, "Beach Closed", Toast.LENGTH_SHORT).show();
             }else if (method.equalsIgnoreCase("flag")){
                 Toast.makeText(context, "Flag changed", Toast.LENGTH_SHORT).show();
                 runState();
