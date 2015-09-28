@@ -10,7 +10,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,29 +20,32 @@ import android.widget.TextView;
 
 import guinovart.joaquim.lafosca_beach.Models.Beach;
 import guinovart.joaquim.lafosca_beach.Utilities.KidsAdapter;
-import guinovart.joaquim.lafosca_beach.Utilities.putPostToken;
+import guinovart.joaquim.lafosca_beach.Utilities.beachAsyncT;
 
 
 public class BeachActivity extends ActionBarActivity implements OnTaskCompleted {
 
     String baseUrl = "http://lafosca-beach.herokuapp.com/api/v1";
 
+    //Views for the Beach
     TextView stateVW;
     TextView flagTW;
     TextView happinessTW;
     TextView dirtinessTW;
     TextView kidsTW;
 
+    //Views for ListView
     ListView list;
     KidsAdapter adapter;
     EditText inputSearch;
 
-
+    //Buttons
     Button openBttn;
     Button cleanBttn;
     Button niveaBttn;
     Button flagBttn;
 
+    //Beach object
     Beach beach;
 
 
@@ -52,28 +54,33 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_beach);
 
+        //inject views to activity
         stateVW = (TextView) findViewById(R.id.statetTV);
         flagTW = (TextView) findViewById(R.id.flagTV);
         happinessTW = (TextView) findViewById(R.id.happinessTV);
         dirtinessTW = (TextView) findViewById(R.id.dirtinessTV);
         kidsTW = (TextView) findViewById(R.id.kidsTV);
 
+        //listview injection to activity
         list = (ListView) findViewById(R.id.kid_list);
         inputSearch = (EditText) findViewById(R.id.inputSearch);
 
+        //buttons injection to activity
         openBttn = (Button) findViewById(R.id.close_button);
         cleanBttn = (Button) findViewById(R.id.clean_button);
         niveaBttn = (Button) findViewById(R.id.nivea_button);
         flagBttn = (Button) findViewById(R.id.flag_button);
 
-
+        //getting the token from SahredPrefrences
         String auth_token_string = getToken();
 
+        //if there's no token we come back to login/sigin MainActivity
         if(auth_token_string.equals("")){
             Intent i = new Intent(this,MainActivity.class);
             startActivity(i);
+        //otherwise we start asynctask to get Beach object from API
         }else{
-            putPostToken GSTTask = new putPostToken(auth_token_string,this,this,"state");
+            beachAsyncT GSTTask = new beachAsyncT(auth_token_string,this,this,"state");
             GSTTask.execute(baseUrl+"/state");
         }
     }
@@ -100,58 +107,63 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
 
         return super.onOptionsItemSelected(item);
     }
-    public void Clean(View v){
 
-    }
+    //same OnClick method for Open/Close/Nivea
     public void CloseCleanNivea (View v){
-        //TextView textV = (TextView) v;
         String text = ((Button)v).getText().toString();
         String token = getToken();
-        putPostToken PCTTask = null;
+        beachAsyncT ATask = null;
         String url = null;
+        //case Button text is OPEN, correspondent constructor with "open" tag
         if(text.equalsIgnoreCase("OPEN")){
-            PCTTask = new putPostToken(token,this,this,"open");
+            ATask = new beachAsyncT(token,this,this,"open");
             url = baseUrl+"/open";
-
+        //case Button text is CLOSE, correspondent constructor with "close" tag
         }else if(text.equalsIgnoreCase("CLOSE")){
-            PCTTask = new putPostToken(token,this,this,"close");
+            ATask = new beachAsyncT(token,this,this,"close");
             url = baseUrl+"/close";
-
+        //case Button text is CLEAN, correspondent constructor with "clean" tag
         }else if(text.equalsIgnoreCase("CLEAN")){
-            PCTTask = new putPostToken(token,this,this,"clean");
+            ATask = new beachAsyncT(token,this,this,"clean");
             url = baseUrl+"/clean";
+        //case Button text is NIVEA, correspondent constructor with "nivea" tag
         }else if(text.equalsIgnoreCase("NIVEA")){
-            PCTTask = new putPostToken(token,this,this,"nivea");
+            ATask = new beachAsyncT(token,this,this,"nivea");
             url = baseUrl+"/nivea-rain";
         }
-        PCTTask.execute(url);
+        //execute Asyn
+        ATask.execute(url);
     }
+
+    //method onClick to change Flag
     public void changeFlag(View V){
+        //Alert List Dialog to choose flag colour
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose flag colour");
         builder.setItems(R.array.colors_array, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
                 String token = getToken();
-                putPostToken PCTTask = new putPostToken(token,BeachActivity.this,BeachActivity.this,"flag",item);
+                beachAsyncT ATask = new beachAsyncT(token,BeachActivity.this,BeachActivity.this,"flag",item);
                 String url = null;
                 url = baseUrl+"/flag";
-                PCTTask.execute(url);
+                ATask.execute(url);
             }
         });
         AlertDialog alert = builder.create();
         alert.show();
 
     }
+
+    //method to getToken from SharedPreferences
     public String getToken (){
         String token = null;
-
         SharedPreferences settings = PreferenceManager
                 .getDefaultSharedPreferences(this);
         token = settings.getString("token", "");
-        Log.d("token",token);
-
         return token;
     }
+
+    //modify UI with Beach object values when this is open
     public void openBeach(Beach beach){
         stateVW.setText(beach.state);
         stateVW.setVisibility(View.VISIBLE);
@@ -177,6 +189,7 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
         cleanBttn.setVisibility(View.GONE);
         niveaBttn.setVisibility(View.VISIBLE);
     }
+    //modify UI with Beach object values when this is open
     public void closeBeach(Beach beach){
         stateVW.setText(beach.state);
         flagTW.setVisibility(View.GONE);
@@ -189,31 +202,32 @@ public class BeachActivity extends ActionBarActivity implements OnTaskCompleted 
         cleanBttn.setVisibility(View.VISIBLE);
         niveaBttn.setVisibility(View.GONE);
     }
+
+    //set adapter to listView and ontextchanged to launch filter
     public void getKids(Beach beach){
         adapter = new KidsAdapter(this,beach.kids);
         inputSearch.addTextChangedListener(new TextWatcher() {
 
             @Override
             public void afterTextChanged(Editable arg0) {
-                //adapter.getFilter().filter(arg0.toString());
                 BeachActivity.this.adapter.getFilter().filter(arg0);
-
             }
 
             @Override
             public void beforeTextChanged(CharSequence arg0, int arg1,
                                           int arg2, int arg3) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence arg0, int arg1, int arg2,
                                       int arg3) {
-                //BeachActivity.this.adapter.getFilter().filter(arg0);
             }
         });
         list.setAdapter(adapter);
     }
+
+    //listener for AsyncTask completed with success
+    //update UI
     @Override
     public void onTaskCompleted(Beach beach) {
         this.beach=beach;
